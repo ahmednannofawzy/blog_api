@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: blog_db_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: blog_db
+      MYSQL_USER: ahmed
+      MYSQL_PASSWORD: '123456'
+    ports:
+      - "3306:3306"
+    volumes:
+      - blog_mysql_data:/var/lib/mysql
+
+  web:
+    build: .
+    container_name: blog_api_container
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://ahmed:123456@db:3306/blog_db
+      - SECRET_KEY=supersecretkeyforblog123456789
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+    depends_on:
+      - db
+
+volumes:
+  blog_mysql_data:
